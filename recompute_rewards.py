@@ -1,0 +1,320 @@
+import csv
+import ast
+import numpy as np
+from ppo_model import ActorCritic
+from collections import deque
+import torch
+import argparse
+
+parser =argparse.ArgumentParser()
+parser.add_argument('--outfile',type=str,default='sarsd_buffer_elijah.csv') #these rewards will be updated
+parser.add_argument('--infile',type=str,default='raw_states_charlie.csv') #pull lidar scans from this file
+
+parser.add_argument('--reward_only',type=bool,default=False)
+args=parser.parse_args()
+
+data_name = args.outfile.replace('raw_states_', '').replace('.csv', '')  # 'charlie'
+scan_latent, scan_raw, speed, steer = None, None, None, None
+raw_scan_prime = None
+def compute_straightness(ranges: np.ndarray) -> float:
+    beams_per_degree = 3
+    forward_idx = 540
+    window_size = 40 * beams_per_degree
+    lo = forward_idx - window_size // 2
+    hi = forward_idx + window_size // 2
+    clean = np.nan_to_num(ranges[lo:hi], nan=30.0, posinf=30.0)
+    raw = np.mean(clean) / 40.0
+    return 1 / (1 + np.exp(-raw))  # sigmoid
+import numpy as np
+
+def centerline_reward_symmetry(ranges):
+    n = len(ranges)
+    mid = n // 2
+    
+    right_side = ranges[:mid]
+    left_side = ranges[mid:]
+    
+    left_min = np.min(left_side)
+    right_min = np.min(right_side)
+    
+    # Normalized asymmetry: 0 = perfectly centered, 1 = hugging one wall
+    asymmetry = abs(left_min - right_min) / (left_min + right_min + 1e-6)
+    
+    # Reward for being centered (positive when centered, decays with asymmetry)
+    return 3.0 * (1.0 - asymmetry)
+
+
+#stanley, sterling
+def calculate_reward(ranges,speed,steering):
+    min_dist = np.min(ranges)
+    straightness, forward_mean = compute_straightness_plock(ranges)
+    
+    threshold = max(3,speed) 
+    is_cornering = max(0, threshold - forward_mean) / threshold
+
+    speed_corner_penalty  = -10.0 * speed * is_cornering
+    speed_straight_bonus = 2.0 * (np.exp(speed / 2.0)) * (1-is_cornering)
+    speed_confidence_bonus = 1.5* speed * min(forward_mean, 5.0) #max of 10 reward
+    steering_corner_bonus = 8.0 * abs(steering) * is_cornering
+    weaving_penalty = -2.0 * abs(steering) * (straightness **2.5)
+    reward_safety =  20* (min(np.min(ranges) / 0.4, 1.0) - 1.0)   #used to be 0.5 #NEED TO ADJUST THIS LINE depending on average track width
+
+    centerline_reward=centerline_reward_symmetry(ranges)
+
+    return centerline_reward+weaving_penalty + reward_safety  +steering_corner_bonus +speed_corner_penalty +speed_straight_bonus+speed_confidence_bonus
+
+def compute_straightness_plock(ranges: np.ndarray) -> float:
+    beams_per_degree = 3
+    forward_idx = 540
+    window_size = 5 * beams_per_degree
+    lo = forward_idx - window_size // 2
+    hi = forward_idx + window_size // 2
+    clean = np.nan_to_num(ranges[lo:hi], nan=30.0, posinf=30.0)
+    forward_mean= np.mean(clean)
+    return float(np.clip(np.mean(clean) / 10.0, 0.0, 1.0)),forward_mean #10m forward is completely straight to the car
+
+#plock
+def calculate_reward_plock(ranges,speed,steering):
+    min_dist = np.min(ranges)
+    straightness, forward_mean = compute_straightness_plock(ranges)
+    
+    threshold = max(3,speed) 
+    is_cornering = max(0, threshold - forward_mean) / threshold
+
+    speed_corner_penalty  = -7.0 * speed * is_cornering
+    speed_straight_bonus = 2.0 * (np.exp(speed / 2.0)) * (1-is_cornering)
+    speed_confidence_bonus = 1.5* speed * min(forward_mean, 5.0) #max of 10 reward
+    steering_corner_bonus = 8.0 * abs(steering) * is_cornering
+    weaving_penalty = -2.0 * abs(steering) * (straightness **2.5)
+    reward_safety =  20* (min(np.min(ranges) / 0.4, 1.0) - 1.0)   #used to be 0.5 #NEED TO ADJUST THIS LINE depending on average track width
+
+
+    return weaving_penalty + reward_safety  +steering_corner_bonus +speed_corner_penalty +speed_straight_bonus+speed_confidence_bonus
+
+#oak
+#trying dynamic threshold
+def calculate_reward_oak(ranges, speed, steering):
+    min_dist = np.min(ranges)
+    straightness = compute_straightness(ranges)
+    
+    beams_per_degree = 3
+    forward_idx = 540
+    window_size = 40 * beams_per_degree
+    lo = forward_idx - window_size // 2
+    hi = forward_idx + window_size // 2
+    forward_dist = np.mean(np.nan_to_num(ranges[lo:hi], nan=30.0, posinf=30.0))    
+    
+    threshold = max(1.5,speed*1.3)
+    is_cornering = max(0, threshold - forward_dist) / threshold
+    
+    
+    steering_corner_bonus = 6.0 * abs(steering) * is_cornering
+    speed_corner_penalty  = -7.0 * speed * is_cornering
+    
+    speed_straight_bonus = 2.0 * (np.exp(speed / 2.0)) * (1-is_cornering)
+    speed_confidence_bonus = 1.5* speed * min(forward_dist, 5.0) #max of 10 reward
+    weaving_penalty = -2.0 * abs(steering) * (straightness **2.5)
+
+    reward_safety = 9 * (min(np.min(ranges) / 0.3, 1.0) - 1.0)   #used to be 0.5 #NEED TO ADJUST THIS LINE depending on average track width
+
+    return reward_safety +  weaving_penalty  +steering_corner_bonus +speed_corner_penalty +speed_straight_bonus +speed_confidence_bonus
+
+
+
+#latte and muffin and nolan
+def calculate_reward_latte_muffin_nolan(ranges, speed, steering):
+    min_dist = np.min(ranges)
+    straightness = compute_straightness(ranges)
+    
+    beams_per_degree = 3
+    forward_idx = 540
+    window_size = 40 * beams_per_degree
+    lo = forward_idx - window_size // 2
+    hi = forward_idx + window_size // 2
+    forward_dist = np.mean(np.nan_to_num(ranges[lo:hi], nan=30.0, posinf=30.0))    
+    
+    threshold = 3.0 #try 1
+    is_cornering = max(0, threshold - forward_dist) / threshold
+    
+    
+    steering_corner_bonus = 6.0 * abs(steering) * is_cornering
+    speed_corner_penalty  = -5.0 * speed * is_cornering
+    
+    speed_straight_bonus = 2.0 * (np.exp(speed / 2.0)) * (1-is_cornering)
+
+    weaving_penalty = -2.0 * abs(steering) * (straightness **2.5)
+    reward_safety = 9 * (min(np.min(ranges) / 0.5, 1.0) - 1.0)   
+
+    return reward_safety +  weaving_penalty  +steering_corner_bonus +speed_corner_penalty +speed_straight_bonus
+
+
+#kale YES KALE GO 
+#why does kale work in sim but not irl at all
+def calculate_reward_kale(ranges, speed, steering):
+    min_dist = np.min(ranges)
+    straightness = compute_straightness(ranges)
+    
+    beams_per_degree = 3
+    forward_idx = 540
+    window_size = 50 * beams_per_degree
+    lo = forward_idx - window_size // 2
+    hi = forward_idx + window_size // 2
+    forward_dist = np.mean(np.nan_to_num(ranges[lo:hi], nan=30.0, posinf=30.0))    
+    
+    threshold = 3.0 #try 1
+    is_cornering = max(0, threshold - forward_dist) / threshold
+    
+    
+    steering_corner_bonus = 6.0 * abs(steering) * is_cornering
+    speed_corner_penalty  = -5.0 * speed * is_cornering
+    
+    speed_straight_bonus = 1.0 * speed* (1-is_cornering)
+
+
+    weaving_penalty = -2.0 * abs(steering) * max(0,1-is_cornering)**2
+    reward_safety = 13 * (min(np.min(ranges) / 0.6, 1.0) - 1.0)   #16
+
+
+    return reward_safety +  weaving_penalty  +steering_corner_bonus +speed_corner_penalty +speed_straight_bonus
+
+#june
+def calculate_reward_june(ranges, speed, steering):
+    min_dist = np.min(ranges)
+    straightness = compute_straightness(ranges)
+    
+    beams_per_degree = 3
+    forward_idx = 540
+    window_size = 40 * beams_per_degree
+    lo = forward_idx - window_size // 2
+    hi = forward_idx + window_size // 2
+    forward_dist = np.mean(np.nan_to_num(ranges[lo:hi], nan=30.0, posinf=30.0))    
+    
+    threshold = 3.0 #try 1
+    is_cornering = max(0, threshold - forward_dist) / threshold
+    
+    
+    steering_corner_bonus = 6.0 * abs(steering) * is_cornering
+    speed_corner_penalty  = -5.0 * speed * is_cornering
+    
+    speed_straight_bonus = 2.0 * (np.exp(speed / 2.0)) * (1-is_cornering)
+
+    weaving_penalty = -2.0 * abs(steering) * (straightness **2.5)
+    reward_safety = 9 * (min(np.min(ranges) / 0.5, 1.0) - 1.0)   
+
+    return reward_safety +  weaving_penalty  +steering_corner_bonus +speed_corner_penalty +speed_straight_bonus
+
+#iris
+def calculate_reward_iris(ranges, speed, steering):
+    min_dist = np.min(ranges)
+    straightness = compute_straightness(ranges)
+    
+    reward_safety = 8 * (min(np.min(ranges) / 0.5, 1.0) - 1.0)   
+    if min_dist < 0.5:
+        slow_near_corners = -(speed * (1.0 / max(min_dist, 0.5)))
+    else:
+        slow_near_corners = 0
+
+    open_bonus = 2.5 * speed * (straightness ** 2)    
+    speed_reward = 2.5 * speed * (1 + straightness)  #change back to 3
+
+    weaving_penalty = -2.0 * abs(steering) * (straightness **1.5)
+    return reward_safety + slow_near_corners  + open_bonus +weaving_penalty +speed_reward
+
+
+#golf DO NOT CHANGE BECAUSE THIS WORKS WORKS
+def calculate_reward_golf(ranges, speed, steering):
+    min_dist = np.min(ranges)
+    straightness = compute_straightness(ranges)
+    
+    reward_safety = 8 * (min(np.min(ranges) / 0.5, 1.0) - 1.0)
+       
+    if min_dist < 0.4:
+        slow_near_corners = -(speed * (1.0 / max(min_dist, 0.4)))
+    else:
+        slow_near_corners = 0
+
+    speed_reward = 2.0 * speed * (1 + straightness) 
+    weaving_penalty = -2.0 * abs(steering) * (straightness **1.5)
+    return reward_safety + slow_near_corners  + speed_reward +weaving_penalty 
+
+#felix
+def calculate_reward_felix(ranges, speed, steering):
+    straightness = compute_straightness(ranges)
+    
+    reward_safety = -8 * np.exp(-np.min(ranges) / 0.5) #rewards distance away from wall
+    #close to wall?
+
+    slow_near_corners = 1/(speed* 1/min(np.min(ranges),0.5 )) #rewards being slow near a wall
+
+    speed_reward = 0.7 * speed * (1 + straightness *3) #rewards going fast
+    
+    return reward_safety + slow_near_corners   + speed_reward
+#ELIJAH DO NOT TOUCH
+def calculate_reward_elijah(ranges, speed, steering):
+    straightness = compute_straightness(ranges)
+    
+    reward_safety = -6 * np.exp(-np.min(ranges) / 0.5)
+    speed_on_corner_penalty = -3 * speed * max(0.0, 0.65 - straightness)
+    straightness_bonus = 3.7 * straightness * max(0.0, 1 - abs(steering) / 0.4)
+    useless_turn_penalty = -3 * abs(steering) * max(0.0, straightness - 0.6)
+    speed_reward = 0.1 * speed * (1 + straightness)
+    good_turn_bonus = 5 * abs(steering) * max(0.0, 0.65 - straightness)
+    
+    return reward_safety + speed_on_corner_penalty + straightness_bonus + useless_turn_penalty + speed_reward
+
+#charlie
+def calculate_reward_charlie(ranges, speed, steering):
+    straightness = compute_straightness(ranges)
+    wall_penalty = -6.0 if min(ranges) < 0.4 else 0.0
+    useless_turn_penalty = -1.1 * abs(steering) * straightness
+    straightness_bonus = 3.0 * straightness * (1 - abs(steering) / 0.4)
+    speed_reward = 0.02 * speed * (1 + straightness * 3)
+    return useless_turn_penalty + straightness_bonus + speed_reward + wall_penalty
+    
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+model_path = 'ppo_f1tenth_straightness_reward.pth'
+model = ActorCritic(lidar_dim=1080).to(device)
+model.load(model_path, device)
+model.eval()
+#infile has the compressed scans 
+#outfile is the file whos rewards we want to edit
+import os
+
+with open(f'raw_data/{args.infile}', mode='r') as raw_file, \
+     open(f'transitions/{args.outfile}', mode='r') as sarsd_file, \
+     open('temp_output.csv', mode='w', newline='') as out_file:
+
+    raw_reader = csv.reader(raw_file)
+    sarsd_reader = csv.DictReader(sarsd_file)
+    writer = csv.writer(out_file)
+    writer.writerow(['state', 'action', 'reward', 'state_prime', 'done'])
+
+    straightness_vals = []
+    min_range_vals=[]
+    row_counter = 0
+    for raw_row, sarsd_row in zip(raw_reader, sarsd_reader):
+        scan = np.array(ast.literal_eval(raw_row[0]), dtype=np.float32)
+        speed = float(raw_row[1])
+        steer = float(raw_row[2])
+        straightness_vals.append(compute_straightness(scan))
+        min_range_vals.append(min(scan))
+        reward = calculate_reward(scan, speed, steer)
+        done = 1 if scan.min() < 0.15 else 0 
+        writer.writerow([
+            sarsd_row['state'],
+            sarsd_row['action'],
+            reward,
+            sarsd_row['state_prime'],
+            done
+        ])
+        row_counter += 1
+        if row_counter % 2000 == 0:
+            print(f'processed {row_counter} rows')
+
+straightness_vals = np.array(straightness_vals)
+min_range_vals = np.array(min_range_vals)
+print(f"straightness: min={straightness_vals.min():.3f} max={straightness_vals.max():.3f} mean={straightness_vals.mean():.3f}")
+print(f"min_range: min={min_range_vals.min():.3f} max={min_range_vals.max():.3f} mean={min_range_vals.mean():.3f}")
+# replace original with updated version
+os.replace('temp_output.csv', f'transitions/{args.outfile}')
+print(f'done, updated {args.outfile}')
