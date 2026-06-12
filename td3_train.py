@@ -1,3 +1,5 @@
+
+
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
@@ -12,7 +14,7 @@ import argparse
 parser =argparse.ArgumentParser()
 parser.add_argument('--infile',type=str,default='raw_states_charlie.csv')
 parser.add_argument('--name',type=str,default='dumdum')
-parser.add_argument('--starter',type=str,default='td3_plock.pth')
+parser.add_argument('--starter',type=str,default='td3_ultimate.pth')
 
 
 args=parser.parse_args()

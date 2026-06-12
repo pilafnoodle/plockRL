@@ -85,7 +85,8 @@ def calculate_reward(ranges, speed, steering):
     return useless_turn_penalty + straightness_bonus + speed_reward + reward_safety + good_turn_bonus 
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
-model_path = 'ppo_f1tenth_straightness_reward.pth'
+# model_path = 'ppo_f1tenth_straightness_reward.pth'
+model_path='encoder.pth'
 model = ActorCritic(lidar_dim=1080).to(device)
 model.load(model_path, device)
 model.eval()
@@ -100,6 +101,8 @@ def compress_lidar(ranges):
 
 with open(f'raw_data/{args.infile}', mode='r') as infile, \
      open(f'transitions/{data_name}.csv', mode='w', newline='') as outfile:
+    
+    print(f'opening {args.infile}, parsing to {data_name}')
     reader = csv.reader(infile)
     writer = csv.writer(outfile)
     writer.writerow(['state', 'action', 'reward', 'state_prime', 'done'])

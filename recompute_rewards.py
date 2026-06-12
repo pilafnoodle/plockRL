@@ -5,6 +5,7 @@ from ppo_model import ActorCritic
 from collections import deque
 import torch
 import argparse
+import math
 
 parser =argparse.ArgumentParser()
 parser.add_argument('--outfile',type=str,default='sarsd_buffer_elijah.csv') #these rewards will be updated
@@ -40,12 +41,216 @@ def centerline_reward_symmetry(ranges):
     # Normalized asymmetry: 0 = perfectly centered, 1 = hugging one wall
     asymmetry = abs(left_min - right_min) / (left_min + right_min + 1e-6)
     
-    # Reward for being centered (positive when centered, decays with asymmetry)
     return 3.0 * (1.0 - asymmetry)
 
+def compute_straightness_plock(ranges: np.ndarray) -> float:
+    beams_per_degree = 3
+    forward_idx = 540
+    window_size = 5 * beams_per_degree
+    lo = forward_idx - window_size // 2
+    hi = forward_idx + window_size // 2
+    clean = np.nan_to_num(ranges[lo:hi], nan=30.0, posinf=30.0)
+    forward_mean= np.mean(clean)
+    return float(np.clip(np.mean(clean) / 10.0, 0.0, 1.0)),forward_mean #10m forward is completely straight to the car
+
+def find_gap_alignment_score(ranges: np.ndarray) -> int:
+    gap_window_size = 30
+    lo = 100
+    hi = 980
+    max_start_idx = hi - gap_window_size
+    best_start_index = lo
+    best_sum = -1.0  
+    for x in range(lo, max_start_idx + 1):
+        window = ranges[x : x + gap_window_size]
+        clean_window = np.nan_to_num(window, nan=30.0, posinf=30.0)
+        current_sum = np.sum(clean_window)
+        
+        if current_sum > best_sum:
+            best_sum = current_sum
+            best_start_index = x
+            
+    direction_index = best_start_index + (gap_window_size // 2)
+    
+    error=abs(540-int(direction_index)) #540 is the center scan index
+
+    gap_alignment_score=1-(float(error)/340) #340 is the maximum worst error, if farthest point is at edge of vision
+
+    return gap_alignment_score
+
+#ultimate_interp2
+def calculate_reward(ranges,speed,steering):
+    min_dist = np.min(ranges)
+    straightness, forward_mean = compute_straightness_plock(ranges)
+    
+    threshold = max(3,speed) 
+    steer_threshold = max(2.5,speed) 
+
+    speed_straight_bonus =  0.1 * speed * math.tanh(forward_mean/threshold)
+    speed_corner_penalty = -1* speed * (1-math.tanh(forward_mean/threshold))
+    steering_corner_bonus = 6.0 * abs(steering) * (1-math.tanh(forward_mean/steer_threshold))
+    steering_straight_penalty = -4.0 * abs(steering) * (math.tanh(forward_mean/steer_threshold))
+
+    reward_safety =  8.0*(min(forward_mean/ 0.4, 1.0) - 1.0)   #used to be 0.5 #NEED TO ADJUST THIS LINE depending on average track width
+
+   # centerline_reward=centerline_reward_symmetry(ranges)
+    gap_alignment_reward =  find_gap_alignment_score(ranges)
+    return  reward_safety  +steering_corner_bonus +speed_corner_penalty +speed_straight_bonus +gap_alignment_reward
+
+
+
+#ultimate
+def calculate_reward_ultimate(ranges,speed,steering):
+    min_dist = np.min(ranges)
+    straightness, forward_mean = compute_straightness_plock(ranges)
+    
+    threshold = max(3,speed) 
+    speed_straight_bonus = speed * math.tanh(forward_mean/threshold)
+    speed_corner_penalty = -speed * (1-math.tanh(forward_mean/threshold))
+    steering_corner_bonus = 3.0 * abs(steering) * (1-math.tanh(forward_mean/threshold))
+    reward_safety =  (min(min_dist/ 0.4, 1.0) - 1.0)   #used to be 0.5 #NEED TO ADJUST THIS LINE depending on average track width
+
+    centerline_reward=centerline_reward_symmetry(ranges)
+    gap_alignment_reward = 2.0*find_gap_alignment_score(ranges)
+    return centerline_reward + reward_safety  +steering_corner_bonus +speed_corner_penalty +speed_straight_bonus +gap_alignment_reward
+
+
+
+#veil
+def calculate_reward_v(ranges,speed,steering):
+    min_dist = np.min(ranges)
+    straightness, forward_mean = compute_straightness_plock(ranges)
+    
+    threshold = max(3,speed) 
+    is_cornering = max(0, threshold - forward_mean) / threshold
+
+    speed_corner_penalty  = -14.0 * speed * is_cornering
+    speed_straight_bonus = 8.0 * (np.exp(speed / 2.0)) * (1-is_cornering)
+    steering_corner_bonus = 8.0 * abs(steering) * is_cornering
+    reward_safety =  20* (min(np.min(ranges) / 0.4, 1.0) - 1.0)   #used to be 0.5 #NEED TO ADJUST THIS LINE depending on average track width
+
+    centerline_reward=centerline_reward_symmetry(ranges)
+
+    return centerline_reward + reward_safety  +steering_corner_bonus +speed_corner_penalty +speed_straight_bonus
+
+
+
+#van, vega
+def calculate_reward_v(ranges,speed,steering):
+    min_dist = np.min(ranges)
+
+    #not actually using straightness, just getting forward mean
+    dummy, forward_mean = compute_straightness_plock(ranges)
+    
+    threshold = max(2,speed) 
+    is_cornering = max(0, threshold - forward_mean) / threshold
+
+    speed_corner_penalty  = -12.0 * speed * is_cornering
+    speed_straight_bonus = 1.0 * (np.exp(speed / 2.0)) * (1-is_cornering)
+    steering_corner_bonus = 8.0 * abs(steering) * is_cornering
+    reward_safety =  2* (min(np.min(ranges) / 0.4, 1.0) - 1.0)  #coeff used to be 20 #used to be 0.5 #NEED TO ADJUST THIS LINE depending on average track width
+
+    centerline_reward=3*centerline_reward_symmetry(ranges)
+
+    return centerline_reward  +steering_corner_bonus +speed_corner_penalty +speed_straight_bonus +reward_safety
+
+
+#ukulele
+#less aggressive speed rewards than udon
+def calculate_reward_ukulele(ranges,speed,steering):
+    min_dist = np.min(ranges)
+
+    #not actually using straightness, just getting forward mean
+    dummy, forward_mean = compute_straightness_plock(ranges)
+    
+    threshold = max(2,speed) 
+    is_cornering = max(0, threshold - forward_mean) / threshold
+
+    speed_corner_penalty  = -12.0 * speed * is_cornering
+    speed_straight_bonus = 20.0 * (np.exp(speed / 2.0)) * (1-is_cornering)
+    steering_corner_bonus = 8.0 * abs(steering) * is_cornering
+    reward_safety =  2* (min(np.min(ranges) / 0.4, 1.0) - 1.0)  #coeff used to be 20 #used to be 0.5 #NEED TO ADJUST THIS LINE depending on average track width
+
+    centerline_reward=centerline_reward_symmetry(ranges)
+
+    return centerline_reward  +steering_corner_bonus +speed_corner_penalty +speed_straight_bonus +reward_safety
+
+
+#udon
+def calculate_reward_udon(ranges,speed,steering):
+    min_dist = np.min(ranges)
+    straightness, forward_mean = compute_straightness_plock(ranges)
+    
+    threshold = max(2,speed) 
+    is_cornering = max(0, threshold - forward_mean) / threshold
+
+    speed_corner_penalty  = -14.0 * speed * is_cornering
+    speed_straight_bonus = 20.0 * (np.exp(speed / 2.0)) * (1-is_cornering)
+    steering_corner_bonus = 8.0 * abs(steering) * is_cornering
+    reward_safety =  20* (min(np.min(ranges) / 0.4, 1.0) - 1.0)   #used to be 0.5 #NEED TO ADJUST THIS LINE depending on average track width
+
+    centerline_reward=2*centerline_reward_symmetry(ranges)
+
+    return centerline_reward + reward_safety  +steering_corner_bonus +speed_corner_penalty +speed_straight_bonus
+
+
+
+
+#veggie, universe, umbra,  s
+def calculate_reward_universe(ranges,speed,steering):
+    min_dist = np.min(ranges)
+    straightness, forward_mean = compute_straightness_plock(ranges)
+    
+    threshold = max(3,speed) 
+    is_cornering = max(0, threshold - forward_mean) / threshold
+
+    speed_corner_penalty  = -14.0 * speed * is_cornering
+    speed_straight_bonus = 8.0 * (np.exp(speed / 2.0)) * (1-is_cornering)
+    steering_corner_bonus = 8.0 * abs(steering) * is_cornering
+    reward_safety =  10* (min(np.min(ranges) / 0.4, 1.0) - 1.0)   #used to be 0.5 #NEED TO ADJUST THIS LINE depending on average track width
+
+    centerline_reward=3*centerline_reward_symmetry(ranges)
+
+    return centerline_reward + reward_safety  +steering_corner_bonus +speed_corner_penalty +speed_straight_bonus
+
+
+#summer,tofu,twig,veggie
+def calculate_reward_stt(ranges,speed,steering):
+    min_dist = np.min(ranges)
+    straightness, forward_mean = compute_straightness_plock(ranges)
+    
+    threshold = max(3,speed) 
+    is_cornering = max(0, threshold - forward_mean) / threshold
+
+    speed_corner_penalty  = -14.0 * speed * is_cornering
+    speed_straight_bonus = 8.0 * (np.exp(speed / 2.0)) * (1-is_cornering)
+    steering_corner_bonus = 8.0 * abs(steering) * is_cornering
+    reward_safety =  20* (min(np.min(ranges) / 0.4, 1.0) - 1.0)   #used to be 0.5 #NEED TO ADJUST THIS LINE depending on average track width
+
+    centerline_reward=centerline_reward_symmetry(ranges)
+
+    return centerline_reward + reward_safety  +steering_corner_bonus +speed_corner_penalty +speed_straight_bonus
+
+
+#sterling
+def calculate_reward_sterling(ranges,speed,steering):
+    min_dist = np.min(ranges)
+    straightness, forward_mean = compute_straightness_plock(ranges)
+    
+    threshold = max(3,speed) 
+    is_cornering = max(0, threshold - forward_mean) / threshold
+
+    speed_corner_penalty  = -14.0 * speed * is_cornering
+    speed_straight_bonus = 8.0 * (np.exp(speed / 2.0)) * (1-is_cornering)
+    steering_corner_bonus = 8.0 * abs(steering) * is_cornering
+    weaving_penalty = -2.0 * abs(steering) * (straightness **2.5)
+    reward_safety =  20* (min(np.min(ranges) / 0.4, 1.0) - 1.0)   #used to be 0.5 #NEED TO ADJUST THIS LINE depending on average track width
+
+    centerline_reward=centerline_reward_symmetry(ranges)
+
+    return centerline_reward+weaving_penalty + reward_safety  +steering_corner_bonus +speed_corner_penalty +speed_straight_bonus
 
 #stanley, sterling
-def calculate_reward(ranges,speed,steering):
+def calculate_reward_stanley(ranges,speed,steering):
     min_dist = np.min(ranges)
     straightness, forward_mean = compute_straightness_plock(ranges)
     
@@ -272,7 +477,8 @@ def calculate_reward_charlie(ranges, speed, steering):
     return useless_turn_penalty + straightness_bonus + speed_reward + wall_penalty
     
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
-model_path = 'ppo_f1tenth_straightness_reward.pth'
+# model_path = 'ppo_f1tenth_straightness_reward.pth'
+model_path='encoder.pth'
 model = ActorCritic(lidar_dim=1080).to(device)
 model.load(model_path, device)
 model.eval()
@@ -283,6 +489,8 @@ import os
 with open(f'raw_data/{args.infile}', mode='r') as raw_file, \
      open(f'transitions/{args.outfile}', mode='r') as sarsd_file, \
      open('temp_output.csv', mode='w', newline='') as out_file:
+
+    print(f'opening {args.infile}, recomputing rewards to {args.outfile}')
 
     raw_reader = csv.reader(raw_file)
     sarsd_reader = csv.DictReader(sarsd_file)

@@ -5,8 +5,8 @@ import argparse
 import os
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--infile', type=str, default='raw_states_stanley_outside_combined.csv')
-parser.add_argument('--outfile', type=str, default='raw_states_stanley_outside_mirror.csv')
+parser.add_argument('--infile', type=str, default='raw_states_ultimate.csv')
+parser.add_argument('--outfile', type=str, default='raw_states_ultimate_mirror.csv')
 
 args = parser.parse_args()
 
