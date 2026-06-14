@@ -1,0 +1,107 @@
+get perfect data to make fully connected network 
+
+
+/raw data: each row is a state: lidar scan, steering, speed
+/models: trained td3 models
+/transitions: each row is state:[lidar scan, steering,speed],action:[steering,speed],reward, state prime, done flag
+
+encoder.pth uses actorcritic structure from ppo model to encode lidar data and ntohing else
+
+raw_states_charlie.csv: mostly counter clockwise data with minimal crashes
+raw_states_charlie_mirror.csv: flipped data to fake the car going the other way
+raw_states_golf: mostly ccw data with minimal crashes on various tracks, and significant amounts of cw crash data
+raw_states_golf_mirror: golf's mirror
+raw_states_iris_golf: all data collected with iris model concatenated with golf_mirror
+raw_states_iris_golf_charlie: all data collected with iris model concatenated with golf_mirror and charlie_mirror
+raw_states_june: same as iris golf charlie, just better name
+raw_states_june2: dataset collected with td3_june outside
+raw_states_latte: iris, iriscw, irisccw concat with june2
+raw_states_latte_mirror: mirrored latte 
+raw_states_latte2: dataset collected with td3_latte outside
+raw_states_muffin: dataset collected with td3_muffin, with noisy speed and turning injected. also multipled every negative steering angle by 1.5
+raw_states_stanley: cat raw_states_charlie_mirror.csv raw_states_golf_mirror.csv raw_states_june.csv raw_states_latte_mirror.csv raw_states_latte2.csv raw_states_muffin.csv > raw_states_stanley.csv
+raw_states_stanley_outside: collected with td3_stanley on outside track
+
+raw_states_stanley_mirror: stanley_outside mirrored
+raw_states_stanley_outside_combined: outside +outside2+outside3+noisy
+raw_states_stanley_outside_mirror: mirror fo stanley combined
+
+raw_states_stanley_noisy: stanley inference but with speed noise
+raw_statse_stanley_noisy_mirror: mirror of above
+
+raw_states_summer_noisy: summer inference but with speed noise
+raw_states_summer_noiser: summer inference but with speed noise
+
+raw_states_vega: cat raw_states_van.csv raw_states_ukulele.csv raw_states_twig_noisy.csv raw_states_summer_noisy.csv 
+
+
+ cat raw_states_twig_65.csv raw_states_twig_66.csv raw_states_twig_cleanest.csv < raw_states_udon.csv
+ cat raw_states_udon.csv raw_states_current.csv > raw_states_veggie.csv
+
+
+
+models:
+charlie: trained with raw_states_charlie
+golf: trained with raw_states_charlie_mirror
+iris: trained on raw_states_golf_mirror
+june: trained on raw_states_golf_mirror
+kale: trained on raw_states_june
+latte: trained on raw_states_latte_mirror. td3 soft started with iris.pth, because it was the last stable one on straights and turns
+muffin: trained on latte2_mirror, softstarted on latte
+nolan: trained on raw_states_muffin, unsure if works havent tested irl, softstarted with muffin
+oak: training on raw_states_muffin_mirror, softstarted with muffin
+plock: trained on raw_states_latte_mirror, td3, soft started with oak round 1.
+queen: trained on raw_statse_latte_mirror softstarted with oak
+river: trained on raw_statse_latte_mirror softstarted with plock
+stanley: trained on raw_states_stanley
+sterling: trained on raw_states_stanley_noisy_mirror.csv
+summer: trained on raw_states_stanley_noisy_mirror.csv (best one!), softstarted with stanley
+tofu: trained on raw_states_summer_noisy_mirror.csv, softstarted with summer
+twig: trained on raw_states_summer_noisier_mirror.csv, softstarted with summer
+udon: rained on raw_states_twig_noisy.csv, softstarted with twig
+ukulele: trained on raw_states_twig_noisy.csv, softstarted with twig
+van: trained on raw_states_ukulele_mirror.csv
+vega,veil: raw_states_vega_mirror.csv
+
+universe: raw_statse_twig_super_mirror, jumpstarted on twig
+
+umbra: raw_states_universe_mirror, jumpstarted on universe
+
+ultimate: jumpstarted with td3_universe
+
+ultimate_interps were trained on model with interpolated speed and steering
+
+
+pipeline steps:
+1. use parse_raw_data.py to convert raw states [lidar,steering,speed] into a sarsd tuple
+2. use recompute_rewards.py to calculate different rewards without having to rencode lidar, make sure infile is the same file used to generate the sarsd
+3. use td3_train.py to train model
+4. use off_policy_inference.py to run 
+
+example usage:
+
+#go from raw states to sarsd buffer
+python3 parse_raw_data.py --infile raw_states_golf.csv --outfile sarsd_buffer_iris.csv
+
+#run this while changing reward function to create different buffers
+#very important, the raw states file must be the same one the sarsd buffer was parsed from because it grabs parallel lidar scans
+#avoid having to recompress scans for the sarsd buffer
+python3 recompute_rewards.py --infile raw_states_golf.csv --outfile sarsd_buffer_iris.csv
+
+#now train
+python3 td3_train.py --infile sarsd_buffer_iris.csv --name iris --starter [model name]
+
+#run
+python3 off_policy_inference.py --infile td3_iris.pth 
+
+
+current plan:
+softstart td3 with td3_iris
+concat iris data with june data
+retrain and call the new one latte
+
+
+Plock: A-blue
+       B-yellow
+       C-white
+    

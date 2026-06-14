@@ -77,8 +77,57 @@ def find_gap_alignment_score(ranges: np.ndarray) -> int:
 
     return gap_alignment_score
 
-#ultimate_interp2
-def calculate_reward(ranges,speed,steering):
+def find_gap_direction(ranges: np.ndarray):
+    gap_window_size = 30
+    lo, hi = 100, 980
+    max_start_idx = hi - gap_window_size
+    best_start_index, best_sum = lo, -1.0
+    for x in range(lo, max_start_idx + 1):
+        window = np.nan_to_num(ranges[x:x + gap_window_size], nan=30.0, posinf=30.0)
+        s = np.sum(window)
+        if s > best_sum:
+            best_sum, best_start_index = s, x
+    direction_index = best_start_index + (gap_window_size // 2)
+    signed_error = (direction_index - 540) / 425.0   # signed, /425 not /340
+    return float(np.clip(signed_error, -1.0, 1.0))
+
+    #ultimate_interp2, ultimate interp3,
+def calculate_reward(ranges, speed, steering):
+    ranges = np.nan_to_num(ranges, nan=30.0, posinf=30.0, neginf=0.0)
+ 
+    min_dist = np.min(ranges)
+    straightness, forward_mean = compute_straightness_plock(ranges)
+ 
+    threshold = max(3, speed)
+    steer_threshold = max(2.5, speed)
+ 
+    corner_gate = 1.0 - math.tanh(forward_mean / steer_threshold)   # ~1 near walls, ~0 on straights
+    straight_gate = math.tanh(forward_mean / steer_threshold)        # complement
+    speed_straight_bonus = 1.0 * speed * math.tanh(forward_mean / threshold)
+    speed_corner_penalty = -1.0 * speed * corner_gate
+ 
+
+    gap_dir = find_gap_direction(ranges)
+    steer_norm = np.clip(steering / 0.4, -1.0, 1.0)
+ 
+    steer_alignment = steer_norm * gap_dir
+    steering_corner_bonus = 6.0 * steer_alignment * corner_gate
+ 
+    steering_straight_penalty = -3.0 * abs(steer_norm) * straight_gate #interp_set1 has no steering straight penalty
+ 
+    reward_safety = 4.0 * (min(min_dist / 0.2, 1.0) - 1.0)
+ 
+    return (reward_safety
+            + steering_corner_bonus
+            + steering_straight_penalty
+            + speed_corner_penalty
+            + speed_straight_bonus)
+ 
+
+
+
+#ultimate_interp2, ultimate interp3,
+def calculate_reward_ultimate_interp2(ranges,speed,steering):
     min_dist = np.min(ranges)
     straightness, forward_mean = compute_straightness_plock(ranges)
     

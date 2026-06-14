@@ -14,7 +14,7 @@ import argparse
 parser =argparse.ArgumentParser()
 parser.add_argument('--infile',type=str,default='raw_states_charlie.csv')
 parser.add_argument('--name',type=str,default='dumdum')
-parser.add_argument('--starter',type=str,default='td3_ultimate.pth')
+parser.add_argument('--starter',type=str,default='td3_ultimate_interp3.pth')
 
 
 args=parser.parse_args()
