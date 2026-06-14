@@ -91,7 +91,7 @@ def find_gap_direction(ranges: np.ndarray):
     signed_error = (direction_index - 540) / 425.0   # signed, /425 not /340
     return float(np.clip(signed_error, -1.0, 1.0))
 
-    #ultimate_interp2, ultimate interp3,
+    #ultimate_interp2, ultimate interp3, ultimate_interpset1
 def calculate_reward(ranges, speed, steering):
     ranges = np.nan_to_num(ranges, nan=30.0, posinf=30.0, neginf=0.0)
  
@@ -113,20 +113,19 @@ def calculate_reward(ranges, speed, steering):
     steer_alignment = steer_norm * gap_dir
     steering_corner_bonus = 6.0 * steer_alignment * corner_gate
  
-    steering_straight_penalty = -3.0 * abs(steer_norm) * straight_gate #interp_set1 has no steering straight penalty
- 
+    #steering_straight_penalty = -3.0 * abs(steer_norm) * straight_gate #uncomment for interp_set2
     reward_safety = 4.0 * (min(min_dist / 0.2, 1.0) - 1.0)
  
     return (reward_safety
             + steering_corner_bonus
-            + steering_straight_penalty
+            # + steering_straight_penalty
             + speed_corner_penalty
             + speed_straight_bonus)
  
 
 
 
-#ultimate_interp2, ultimate interp3,
+#ultimate_interp2, ultimate interp3, 
 def calculate_reward_ultimate_interp2(ranges,speed,steering):
     min_dist = np.min(ranges)
     straightness, forward_mean = compute_straightness_plock(ranges)
