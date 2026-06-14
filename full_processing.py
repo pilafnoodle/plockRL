@@ -17,8 +17,8 @@ def run(script, *args):
 
 name=args.name
 
-# run("mirror_data.py","--infile",f"raw_states_{name}.csv", "--outfile",f"raw_states_{name}_mirror.csv")
-# run("parse_raw_data.py","--infile", f"raw_states_{name}_mirror.csv","--outfile", f"sarsd_buffer_{name}.csv")
+run("mirror_data.py","--infile",f"raw_states_{name}.csv", "--outfile",f"raw_states_{name}_mirror.csv")
+run("parse_raw_data.py","--infile", f"raw_states_{name}_mirror.csv","--outfile", f"sarsd_buffer_{name}.csv")
 run("recompute_rewards.py", "--infile", f"raw_states_{name}_mirror.csv","--outfile", f"sarsd_buffer_{name}.csv")
 run("td3_train.py", "--infile", f"sarsd_buffer_{name}.csv", "--name",name)
 
