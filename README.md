@@ -35,7 +35,13 @@ train_td3.py
 This trains a model using TD3 with the transition file.
 
 All of the file naming and calling are taken care of by full_processing.py
-# Use 
+
+# Use
+
+Collect a csv using the sarsd_data_collect.py script while the car is running. Rename the file to "raw_states_[name]"
+Run python3 full_processing.py --name [name]
+A model will be output in /models
+
 
 # Known Issues
 
