@@ -8,7 +8,13 @@ PlockRL is a reinforcement learning pipeline based on the TD3 algorithm for F1Te
 # Hardware requirements
 
 # Training pipeline
-Training data is in csv format, where each line is a lidar scan, appended by speed and steering. full_processing.py takes the name of the dataset, calls subprocesses to parse, compute rewards, create transitions for TD3, and outputs a trained model. The following is a description of each subfile and its function:
+Training data is in csv format, where each line is a lidar scan, appended by speed and steering. full_processing.py takes the name of the dataset, calls subprocesses to parse, compute rewards, create transitions for TD3, and outputs a trained model. The TD3 transitions are described below:
+s (state): compressed lidar scan
+a (action): steering,speed tuple
+r (reward): reward for given action at state
+s' (state prime): the state reached by doing action at state s
+d (done flag): 1 if minimum lidar scan is less than 0.12, 0 if else.
+The following is a description of each subfile and its function:
 mirror_data.py
 This augments data by reversing the scan list and inverting steering to mimic a mirrored track to double the amount of training data. 
 parse_raw_data.py
