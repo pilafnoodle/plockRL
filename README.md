@@ -2,10 +2,7 @@
 
 # Overview
 PlockRL is a reinforcement learning pipeline based on the TD3 algorithm for F1Tenth. 
-# Software requirements
- 
 
-# Hardware requirements
 
 # Software file structure
 plockRL/
@@ -51,8 +48,11 @@ Run python3 full_processing.py --name [name]
 A model will be output in /models
 
 # Development details
-The bulk of the work is developing calculate_reward() in recompute_rewards.py. It is still not perfect. The development process consists of choosing which metrics to penalize and which to optimize and making sure that none conflict or overpower each other. This was tested by writing down possible ranges for every reward and comparing. This was not efficient and needs to be a better method.
+Before data could be collected, we required a driver that could drive the car mostly around a track to fine tune with TD3. For this, we used a farthest point follower on the given f1tenth gym simulator. The first iteration of data collected and trained was simulator only. then, 
 
+The bulk of the work is developing calculate_reward() in recompute_rewards.py. It is still not perfect. The development process consists of choosing which metrics to penalize and which to optimize and making sure that none conflict or overpower each other. This was tested by writing down possible ranges for every reward and comparing and adding coefficients. This was not efficient and needs to be a better method.
+
+Every reward function is listed in recompute_rewards.py as well as more details in notes.txt
 
 # Known Issues
 ## Software
