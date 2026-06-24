@@ -1,4 +1,4 @@
-# plockRL: Successes, Failures and Future
+# plockRL: Successes, Failures and Thoughts
 
 # Overview
 PlockRL is a reinforcement learning pipeline based on the TD3 algorithm for F1Tenth. 
@@ -9,8 +9,11 @@ PlockRL is a reinforcement learning pipeline based on the TD3 algorithm for F1Te
 
 # Software file structure
 plockRL/
+
 ├── models/
+
 ├── raw_data/
+
 └── transitions/
 # Training pipeline
 Training data is in csv format, where each line is a lidar scan, appended by speed and steering. full_processing.py takes the name of the dataset, calls subprocesses to parse, compute rewards, create transitions for TD3, and outputs a trained model. The TD3 transitions are described below:
