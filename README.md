@@ -57,21 +57,25 @@ Before data could be collected, we required a driver that could drive the car mo
 
 The bulk of the work is developing calculate_reward() in recompute_rewards.py. The development process consists of choosing which metrics to penalize and which to optimize and making sure that none conflict or overpower each other. This was tested by writing down possible ranges for every reward and comparing and adding coefficients. This was not efficient and needs to be a better method.
 
+Sometimes the model did not steer enough and external multipliers in the inference script would be used to tune steering and speed with multipliers that scale based on average of forward distance. This worked to some extent, but we were unable to bake the behavior into the model so that it would run without multipliers. However, using multipliers, we were able to collect more perfect data to train on. 
+
 Every reward function is listed in recompute_rewards.py as well as more details in notes.txt
 
 ## Known Issues
-### Software
+### No smoothing preprocessing
+The type of tubes used for the track can vary. Add 1D gaussian smoothing to eliminate track material specific variation in the lidar scan. In inference, preprocess scan with same smoothing filter. 
+### need a better simulator 
+The provided F1tenth gym in RViz did not translate well at all to the real car. Much time was spent testing on a real car which is time consuming and tiring. 
+### rewards not specific enough
+Rewards were very simple, for example adding a penalty when any lidar scan was less than a threshold. More specific rewards such as a heading reward based on the direction of the farthest point were introduced, but there was not enough time to develop it.
 
 
-### Hardware
+
 
 ## FUTURE F1TENTH PARTICIPANTS PLEASE READ
 ### attempt heuristic method first
 There are many classical methods for track navigation, such as gap follow, farthest point follower and wall follow. Attempt these first, they are far easier than reinforcement or imitation learning. However these may struggle if competition track intentionally has gaps or holes. 
-### introduce smoothing preprocessing
-The type of tubes used for the track can vary. Add 1D gaussian smoothing to eliminate track material specific variation in the lidar scan. In inference, preprocess scan with same smoothing filter. 
-### get a better simulator 
-The provided F1tenth gym in RViz did not translate well at all to the real car. Much time was spent testing on a real car which is time consuming and tiring. 
+
 ### streamline pipeline asap
 It will save alot of time. Before full_processing.py, the naming and renaming was done by per individual file and commands only ran one file at a time
 ### use rosbags
