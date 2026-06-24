@@ -7,6 +7,11 @@ PlockRL is a reinforcement learning pipeline based on the TD3 algorithm for F1Te
 
 # Hardware requirements
 
+# Software file structure
+plockRL/
+├── models/
+├── raw_data/
+└── transitions/
 # Training pipeline
 Training data is in csv format, where each line is a lidar scan, appended by speed and steering. full_processing.py takes the name of the dataset, calls subprocesses to parse, compute rewards, create transitions for TD3, and outputs a trained model. The TD3 transitions are described below:
 
@@ -52,6 +57,13 @@ The bulk of the work is developing calculate_reward() in recompute_rewards.py. I
 ## Hardware
 
 # FUTURE F1TENTH PARTICIPANTS PLEASE READ
+## attempt heuristic method first
+There are many classical methods for track navigation, such as gap follow, farthest point follower and wall follow. Attempt these first, they are far easier than reinforcement or imitation learning. However these may struggle if competition track intentionally has gaps or holes. 
+## get a better simulator 
+The provided F1tenth gym in RViz did not translate well at all to the real car. Much time was spent testing on a real car which is time consuming and tiring. 
+## create backups of SD card
+Our SD card corrupted itself twice for no reason
+
 
 
 
