@@ -62,10 +62,5 @@ There are many classical methods for track navigation, such as gap follow, farth
 ## get a better simulator 
 The provided F1tenth gym in RViz did not translate well at all to the real car. Much time was spent testing on a real car which is time consuming and tiring. 
 ## create backups of SD card
-Our SD card corrupted itself twice for no reason
-
-
-
-
-# troubleshooting
+Our SD card corrupted itself twice for no reason. Do not attempt to copy SD cards by simply copy pasting files. It will not boot because the user will lose root permissions and ownership of its own account.
 
