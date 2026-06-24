@@ -1,7 +1,7 @@
 # plockRL: Successes, Failures and Thoughts
 
 # Overview
-PlockRL is a reinforcement learning pipeline based on the TD3 algorithm for F1Tenth. 
+PlockRL is a reinforcement learning pipeline based on the TD3 algorithm for F1Tenth. It tunes an imperfect driving model by training on lidar scan, steering and speed data collected while driving
 
 
 # Software file structure
@@ -12,6 +12,7 @@ plockRL/
 ├── raw_data/
 
 └── transitions/
+
 # Training pipeline
 Training data is in csv format, where each line is a lidar scan, appended by speed and steering. full_processing.py takes the name of the dataset, calls subprocesses to parse, compute rewards, create transitions for TD3, and outputs a trained model. The TD3 transitions are described below:
 
@@ -43,27 +44,43 @@ All of the file naming and calling are taken care of by full_processing.py
 
 # Use
 
-Collect a csv using the sarsd_data_collect.py script while the car is running. Rename the file to "raw_states_[name]"
+Collect a csv using the sarsd_data_collect.py script while the car is running.
+
+Rename the file to "raw_states_[name]"
+
 Run python3 full_processing.py --name [name]
+
 A model will be output in /models
 
 # Development details
 Before data could be collected, we required a driver that could drive the car mostly around a track to fine tune with TD3. For this, we used a farthest point follower on the given f1tenth gym simulator. The first iteration of data collected and trained was simulator only. then, 
 
-The bulk of the work is developing calculate_reward() in recompute_rewards.py. It is still not perfect. The development process consists of choosing which metrics to penalize and which to optimize and making sure that none conflict or overpower each other. This was tested by writing down possible ranges for every reward and comparing and adding coefficients. This was not efficient and needs to be a better method.
+The bulk of the work is developing calculate_reward() in recompute_rewards.py. The development process consists of choosing which metrics to penalize and which to optimize and making sure that none conflict or overpower each other. This was tested by writing down possible ranges for every reward and comparing and adding coefficients. This was not efficient and needs to be a better method.
 
 Every reward function is listed in recompute_rewards.py as well as more details in notes.txt
 
 # Known Issues
 ## Software
 
+
 ## Hardware
 
 # FUTURE F1TENTH PARTICIPANTS PLEASE READ
 ## attempt heuristic method first
 There are many classical methods for track navigation, such as gap follow, farthest point follower and wall follow. Attempt these first, they are far easier than reinforcement or imitation learning. However these may struggle if competition track intentionally has gaps or holes. 
+## introduce smoothing preprocessing
+The type of tubes used for the track can vary. Add 1D gaussian smoothing to eliminate track material specific variation in the lidar scan. In inference, preprocess scan with same smoothing filter. 
 ## get a better simulator 
 The provided F1tenth gym in RViz did not translate well at all to the real car. Much time was spent testing on a real car which is time consuming and tiring. 
-## create backups of SD card
-Our SD card corrupted itself twice for no reason. Do not attempt to copy SD cards by simply copy pasting files. It will not boot because the user will lose root permissions and ownership of its own account.
+## streamline pipeline asap
+It will save alot of time. Before full_processing.py, the naming and renaming was done by per individual file and commands only ran one file at a time
+## use rosbags
+I forgot these existed, so all data was collected with csvs.
+
+
+
+
+
+
+
 
