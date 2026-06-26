@@ -157,14 +157,13 @@ We didn't qualify because our car was not able to navigate certain section of th
 
 I feel like the protagonist of a space movie, writing down all their notes about survival and science and placing them in a file to send back to Earth for future astronauts. Good luck to future teams! ;-)
 
+This document is nowhere close to comprehensive, feel free to reach out with questions at amberlin618@gmail.com
 
 Team Plock (Riverside Racers) signing off,
 
 Amber and Alex
 
-This document is nowhere close to comprehensive, feel free to reach out with questions
 
-amberlin618@gmail.com
 
 ## Bonus media
 <table align="center">
