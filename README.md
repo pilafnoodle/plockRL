@@ -73,15 +73,25 @@ plockRL/
 
 ## Use
 
-Start f1tenth_stack in 1 terminal
-open another terminal and start off_policy_inference.py or any other driver script
-open another terminal and start sarsd_data_collect.py, make sure /data directory exists on the car
+1. Open three separate terminal windows or tmux panes on the car.
 
-Rename the file to "raw_states_[name]"
+2. On one window, launch provided f1tenth_stack:
+`ros2 launch f1tenth_stack bringup_launch.py`
 
-Run python3 full_processing.py --name [name]
+3. On another window, launch desired driver script.
 
-A model will be output in /models
+4. On another window, launch data collection:
+`python3 sarsd_data_collect.py`
+
+5. Let car run until it crashes or Ctrl-C.
+
+6. Move collected data from /data on the car to PC for training.
+
+7. On PC, rename file to raw_states_[name].csv. 
+
+8. Run the following:
+`python3 full_processing.py --name [name]`
+Trained model will be in `models/td3_[name].pth`
 
 ## Development details
 Before data could be collected, we required a driver that could drive the car mostly around a track to fine tune with TD3. For this, we used a farthest point follower on the given f1tenth gym simulator. The first iteration of data collected and trained was simulator only. then, 
@@ -92,8 +102,8 @@ The previously trained model would be used to jumpstart the TD3 actor in the nex
 
 We also used a heuristic-based post-processing step. To speed up the car and encourage turning, we added a interpolated multiplier based on the average forward distance.
 ```
-#steer_mult=np.interp(forward_mean,[1.5,2,3],[2.0,1.3,1.1])
-#speed_mult=np.interp(forward_mean, [0.65,2],[0.8,1.0])
+steer_mult=np.interp(forward_mean,[1.5,2,3],[2.0,1.3,1.1])
+speed_mult=np.interp(forward_mean, [0.65,2],[0.8,1.0])
 ```
 However, we had trouble tuning the rewards so that the heuristic would be baked into the model
 
