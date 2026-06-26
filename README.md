@@ -27,39 +27,39 @@ Done: 1 if in crash state
          ┌──────────────────────────────────────────┐
          │          sarsd_data_collect.py           │
          ├──────────────────────────────────────────┤
-         │ • Collects csv logs per frame online     │──► raw_states_current.csv
+         │ • Collects csv logs per frame online     │──> raw_states_current.csv
          └─────────────────────┬────────────────────┘
                                │
-                               ▼
+                               v
          ┌──────────────────────────────────────────┐
          │              mirror_data.py              │
          ├──────────────────────────────────────────┤
-         │ • Augments data by doubling              │──► raw_states_mirror_current.csv
+         │ • Augments data by doubling              │──> raw_states_mirror_current.csv
          │ • Reverses scan list, inverts steering   │
          └─────────────────────┬────────────────────┘
                                │
-                               ▼
+                               v
          ┌──────────────────────────────────────────┐
          │            parse_raw_data.py             │
          ├──────────────────────────────────────────┤
-         │ • Formats dataset into TD3 tuples        │ ──► sarsd_buffer_current.csv
+         │ • Formats dataset into TD3 tuples        │ ──> sarsd_buffer_current.csv
          │ • Calculates dummy rewards               │
          │ • Compresses raw 1080-D scans to 128-D   │
          └─────────────────────┬────────────────────┘
                                │
-                               ▼
+                               v
          ┌──────────────────────────────────────────┐
          │           recompute_rewards.py           │
          ├──────────────────────────────────────────┤
-         │ • Calculate rewards                      │──► sarsd_buffer_current.csv 
+         │ • Calculate rewards                      │──> sarsd_buffer_current.csv 
          │ • Overwrites dummy rewards in place      │
          └─────────────────────┬────────────────────┘
                                │
-                               ▼
+                               v
          ┌──────────────────────────────────────────┐
          │               train_td3.py               │
          ├──────────────────────────────────────────┤
-         │ • Offline training loop                  │──► td3_current.pth 
+         │ • Offline training loop                  │──> td3_current.pth 
          │ • Actor updates delayed by 2 epochs      │
          └──────────────────────────────────────────┘
 ```
