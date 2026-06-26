@@ -1,4 +1,4 @@
-# plockRL: Successes, Failures and Thoughts
+# PlockRL: Successes, Failures and Thoughts
 
 ## Overview
 PlockRL is a reinforcement learning pipeline based on the TD3 algorithm for F1Tenth. It tunes an imperfect driving model by training on lidar scan, steering and speed data collected while driving. TD3 is an offline algorithm that calculates the reward of the current state by looking at the actions taken and reward of future states. It requires a transition tuple in the state, action, state_prime, reward, done state format
@@ -97,7 +97,7 @@ Inference was optimized to around 2ms per input, which is faster than lidar scan
 The type of tubes used for the track can vary. Add 1D gaussian smoothing to eliminate track material specific variation in the lidar scan. In inference, preprocess scan with same smoothing filter. 
 
 ### Automate reward tuning
-Our rewards were tuned by hand per iteration which was very time consuming. Test many rewards at once and find a way to evaluate models on **software**.
+Our rewards were tuned by hand per iteration which was very time consuming. Test many rewards at once and find a way to evaluate models on **software only**. 
 
 ### Develop better simulator 
 The provided F1tenth gym in RViz did not translate well at all to the real car. Much time was spent testing on a real car which is time consuming and tiring. 
@@ -105,18 +105,18 @@ The provided F1tenth gym in RViz did not translate well at all to the real car. 
 ### Create more specific rewards
 Rewards were very simple, for example adding a penalty when any lidar scan was less than a threshold. More specific rewards such as a heading reward based on the direction of the farthest point were introduced, but there was not enough time to develop it.
 
-## FUTURE CISL F1TENTH PARTICIPANTS PLEASE READ
-### Attempt heuristic method first
-There are many classical methods for track navigation, such as gap follow, farthest point follower and wall follow. Attempt these first, they are far easier than reinforcement or imitation learning. However these may struggle if competition track intentionally has gaps or holes. 
-
-### Streamline pipeline asap
-It will save alot of time.
-
 ### Use rosbags
 I forgot these existed, so all data was collected with csvs. Rosbags have synchronization.
 
+## FUTURE F1TENTH PARTICIPANTS PLEASE READ
+### Attempt heuristic method first
+There are many classical methods for track navigation, such as gap follow, farthest point follower and wall follow. Attempt these first, they are far easier than reinforcement or imitation learning. However these may struggle if competition track intentionally has gaps or holes. 
+
 ## Isolate network
 Originally we had used Tailscale to SSH into the car, but some spots in Winston Chung Hall were spotty and caused the car to disconnect. The solution was using our own router to connect to the car. **Make sure the router's subnet and the Lidar's subnet are different, otherwise they will fight for connection!**
+
+## Use the controller 
+The controller is so much more than just the deadman switch! Use ROS services to trigger scripts using buttons. We wired a data collection script to start and stop. 
 
 ## Roboracer @ IV 2026
 We didn't qualify because our car was not able to navigate certain section of the track. The track consisted of bumpy orange tubes and smooth black tubes, and our model was only trained on bumpy orange tubes. We believe the failure to navigate black tubes was because of lack of preprocessing and our model had overfit to the bumpy tubes. The track specifications given to us by Roboracer (overall geometry, min and max width) were also very different from the given track. Roboracer also did not let us know about different types of tubes in the same track. We worked in parallel to test heuristic methods and retrain the model on race day, but it did not work. Our TD3 process was very iterative and required multiple rounds of data collection and training, which we did not have time for. However the process of building the car from scratch, wiring up connections, learning RL trial and error was enough of a learning experience in it of itself.
