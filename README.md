@@ -90,7 +90,12 @@ The bulk of the work is developing calculate_reward() in recompute_rewards.py. T
 
 The previously trained model would be used to jumpstart the TD3 actor in the next training with a different reward function so it could learn quicker. 
 
-We also used a heuristic-based post-processing step. To speed up the car and encourage turning, we added a interpolated multiplier based on the average forward distance. However, we had trouble tuning the rewards so that the heuristic would be baked into the model
+We also used a heuristic-based post-processing step. To speed up the car and encourage turning, we added a interpolated multiplier based on the average forward distance.
+```
+#steer_mult=np.interp(forward_mean,[1.5,2,3],[2.0,1.3,1.1])
+#speed_mult=np.interp(forward_mean, [0.65,2],[0.8,1.0])
+```
+However, we had trouble tuning the rewards so that the heuristic would be baked into the model
 
 Every reward function is listed in recompute_rewards.py as well as more details in notes.txt
 
