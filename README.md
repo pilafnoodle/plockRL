@@ -135,13 +135,18 @@ Team Plock (Riverside Racers) signing off,
 Amber and Alex
 
 ## Bonus media
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/db2cfe1f-52bf-48d3-9c3c-23be15d116dc" width="35%" alt="Unofficial Mascot Birt" />
-  <img width="1080" height="1920" alt="20260521_2204261" src="https://github.com/user-attachments/assets/d07d52d0-5fe1-40eb-8efd-4f48ada4afa6" />
-
-</p>
-<p align="center"><em>His name is Birt</em></p>
-
+<table align="center">
+  <tr>
+    <td align="center" valign="top" width="40%">
+      <img src="https://github.com/user-attachments/assets/db2cfe1f-52bf-48d3-9c3c-23be15d116dc" width="100%" alt="Unofficial Mascot Birt" /><br/>
+      <sub>His name is birt</sub>
+    </td>
+    <td align="center" valign="top" width="40%">
+      <img src="https://github.com/user-attachments/assets/d07d52d0-5fe1-40eb-8efd-4f48ada4afa6" width="100%" /><br/>
+      <sub>Avoidance testing</sub>
+    </td>
+  </tr>
+</table>
 <table align="center">
   <tr>
     <td align="center" width="33%">
