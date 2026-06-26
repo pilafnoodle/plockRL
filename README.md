@@ -1,16 +1,7 @@
 # PlockRL: Successes, Failures and Thoughts
 
 ## Overview
-PlockRL is a reinforcement learning pipeline for F1Tenth based on the TD3 algorithm. It tunes an imperfect driving model offline by training on lidar scan, steering and speed data collected while driving. It requires a transition tuple in the state, action, state_prime, reward, done state format.
-
-In the context of PlockRL:
-```
-State: the current lidar scan
-Action: speed, steering
-State_prime: the next lidar scan captured
-Reward: value of the current action at the current state
-Done: 1 if in crash state
-```
+PlockRL is a reinforcement learning pipeline for F1Tenth based on the TD3 algorithm. It tunes an imperfect driving model offline by training on lidar scan, steering and speed data collected while driving. 
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/d62715da-ecab-415a-bbfa-993527dae3f9" width="45%" />
@@ -104,7 +95,16 @@ Some models have specific post processing multipliers, check off_policy_inferenc
 
 ## Development details
 
-Before data could be collected, we required a driver that could drive the car mostly around a track to fine tune with TD3. For this, we used a farthest point follower on the given f1tenth gym simulator. The first iteration of data collected and trained was simulator only. then, 
+Before data could be collected, we required a driver that could drive the car mostly around a track to fine tune with TD3. For this, we used a farthest point follower on the given f1tenth gym simulator. The first iteration of data collected and trained was simulator only.  
+
+PlockRL requires a transition tuples in the state, action, state_prime, reward, done state format.
+```
+State: the current lidar scan
+Action: speed, steering
+State_prime: the next lidar scan captured
+Reward: value of the current action at the current state
+Done: 1 if in crash state
+```
 
 The bulk of the work is developing calculate_reward() in recompute_rewards.py. The development process consists of choosing which metrics to penalize and which to optimize and making sure that none conflict or overpower each other. This was tested by writing down possible ranges for every reward and comparing and adding coefficients. This was not efficient and needs to be a better method. 
 
