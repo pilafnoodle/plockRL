@@ -231,12 +231,12 @@ class TD3ActorNode(Node):
             #speed_mult = np.interp(forward_mean, [0.65 ,1.0 ,2.0 ,3.0], [0.5,1.0,1.2,1.3]) #utliamte interp2
 
             #ultimate_interp_set2   
-            #steer_mult=np.interp(forward_mean,[1.5,2,3],[2.0,1.3,1.1])
-            #speed_mult=np.interp(forward_mean, [0.65,2],[0.8,1.0])
+            steer_mult=np.interp(forward_mean,[1.5,2,3],[2.0,1.3,1.1])
+            speed_mult=np.interp(forward_mean, [0.65,2],[0.8,1.0])
 
 
-            # steering*=steer_mult
-            # speed*=speed_mult   
+            steering*=steer_mult
+            speed*=speed_mult   
 
 
 
