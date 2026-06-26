@@ -14,6 +14,51 @@ plockRL/
 
 ## Architecture
 
+```
+                  [ Car Running Inference ]
+                     (Naive or Model Base)
+                               │
+                               ▼
+         ┌──────────────────────────────────────────┐
+         │          sarsd_data_collect.py           │
+         ├──────────────────────────────────────────┤
+         │ • Collects csv logs per frame online     │──► raw_states_current.csv
+         └─────────────────────┬────────────────────┘
+                               │
+                               ▼
+         ┌──────────────────────────────────────────┐
+         │              mirror_data.py              │
+         ├──────────────────────────────────────────┤
+         │ • Augments data by doubling              │──► raw_states_mirror_current.csv
+         │ • Reverses scan list, inverts steering   │
+         └─────────────────────┬────────────────────┘
+                               │
+                               ▼
+         ┌──────────────────────────────────────────┐
+         │            parse_raw_data.py             │
+         ├──────────────────────────────────────────┤
+         │ • Formats dataset into TD3 tuples        │ ──► sarsd_buffer_current.csv
+         │ • Calculates dummy rewards               │
+         │ • Compresses raw 1080-D scans to 128-D   │
+         └─────────────────────┬────────────────────┘
+                               │
+                               ▼
+         ┌──────────────────────────────────────────┐
+         │           recompute_rewards.py           │
+         ├──────────────────────────────────────────┤
+         │ • Calculate rewards                      │──► sarsd_buffer_current.csv 
+         │ • Overwrites dummy rewards in place      │
+         └─────────────────────┬────────────────────┘
+                               │
+                               ▼
+         ┌──────────────────────────────────────────┐
+         │               train_td3.py               │
+         ├──────────────────────────────────────────┤
+         │ • Offline training loop                  │──► td3_current.pth 
+         │ • Actor updates delayed by 2 epochs      │
+         └──────────────────────────────────────────┘
+```
+
 
 ## Training pipeline
 Training data is in csv format, where each line is a lidar scan, appended by speed and steering. full_processing.py takes the name of the dataset, calls subprocesses to parse, compute rewards, create transitions for TD3, and outputs a trained model. The TD3 transitions are described below:
