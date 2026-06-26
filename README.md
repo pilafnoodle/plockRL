@@ -138,16 +138,19 @@ Amber and Alex
 <img src="https://github.com/user-attachments/assets/db2cfe1f-52bf-48d3-9c3c-23be15d116dc" width="35%" alt="Unofficial Mascot Birt" />
 His name is Birt
 
-
-https://github.com/user-attachments/assets/792fcf31-5676-4f0a-98e0-4ceb745c8890
-
-
-
-https://github.com/user-attachments/assets/9b5fadf0-ad48-43a7-85f5-3a4599ee73b1
-
-
-
-https://github.com/user-attachments/assets/789533e2-8d18-49a4-8d7a-772e97161086
+<table align="center">
+  <tr>
+    <td align="center" width="33%">
+      <video src="https://github.com/user-attachments/assets/9488a808-c09d-4a68-9b96-52cc23e8a26f" controls muted width="100%"></video>
+    </td>
+    <td align="center" width="33%">
+      <video src="https://github.com/user-attachments/assets/9b5fadf0-ad48-43a7-85f5-3a4599ee73b1" controls muted width="100%"></video>
+    </td>
+    <td align="center" width="33%">
+      <video src="https://github.com/user-attachments/assets/789533e2-8d18-49a4-8d7a-772e97161086" controls muted width="100%"></video>
+    </td>
+  </tr>
+</table>
 
 
 
