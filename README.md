@@ -13,8 +13,7 @@ Done: 1 if in crash state
 ```
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/d62715da-ecab-415a-bbfa-993527dae3f9" width="45%" alt="Pipeline Layout" />
-  <img src="https://github.com/user-attachments/assets/db2cfe1f-52bf-48d3-9c3c-23be15d116dc" width="35%" alt="Unofficial Mascot Birt" />
+  <img src="https://github.com/user-attachments/assets/d62715da-ecab-415a-bbfa-993527dae3f9" width="45%" />
 </p>
 <p align="center"><em>Unofficial Mascot, his name is Birt</em></p>
 
@@ -136,7 +135,8 @@ Team Plock (Riverside Racers) signing off,
 Amber and Alex
 
 ## Bonus media
-
+<img src="https://github.com/user-attachments/assets/db2cfe1f-52bf-48d3-9c3c-23be15d116dc" width="35%" alt="Unofficial Mascot Birt" />
+His name is Birt
 
 
 https://github.com/user-attachments/assets/9b5fadf0-ad48-43a7-85f5-3a4599ee73b1
