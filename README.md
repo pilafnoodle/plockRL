@@ -12,6 +12,11 @@ Reward: value of the current action at the current state
 Done: 1 if in crash state
 ```
 
+<img width="2597" height="1797" alt="image" src="https://github.com/user-attachments/assets/d62715da-ecab-415a-bbfa-993527dae3f9" />
+<img width="1500" height="2000" alt="20260614_152620" src="https://github.com/user-attachments/assets/db2cfe1f-52bf-48d3-9c3c-23be15d116dc" />
+Unofficial Mascot, his name is Birt
+
+
 ## Pipeline Architecture
 
 ```
@@ -68,7 +73,9 @@ plockRL/
 
 ## Use
 
-Collect a csv using the sarsd_data_collect.py script while the car is running.
+Start f1tenth_stack in 1 terminal
+open another terminal and start off_policy_inference.py or any other driver script
+open another terminal and start sarsd_data_collect.py, make sure /data directory exists on the car
 
 Rename the file to "raw_states_[name]"
 
@@ -83,10 +90,7 @@ The bulk of the work is developing calculate_reward() in recompute_rewards.py. T
 
 The previously trained model would be used to jumpstart the TD3 actor in the next training with a different reward function so it could learn quicker. 
 
-We also used a heuristic-based post-processing step. To speed up the car and encourage turning, we added a interpolated multiplier based on the average forward distance. 
-
-` ` 
-However we had trouble tuning the rewards so that the heuristic would be baked into the model
+We also used a heuristic-based post-processing step. To speed up the car and encourage turning, we added a interpolated multiplier based on the average forward distance. However, we had trouble tuning the rewards so that the heuristic would be baked into the model
 
 Every reward function is listed in recompute_rewards.py as well as more details in notes.txt
 
@@ -94,7 +98,6 @@ Inference was optimized to around 2ms per input, which is faster than lidar scan
 
 ppo_model.py is the outline of a ppo model, but we just use the encoder from it
 
-https://github.com/user-attachments/assets/0c57cc01-f6db-48dc-9371-cc92c9321915
 
 
 
@@ -118,21 +121,33 @@ I forgot these existed, so all data was collected with csvs. Rosbags have synchr
 ### Attempt heuristic method first
 There are many classical methods for track navigation, such as gap follow, farthest point follower and wall follow. Attempt these first, they are far easier than reinforcement or imitation learning. However these may struggle if competition track intentionally has gaps or holes. 
 
-## Isolate network
+### Isolate network
 Originally we had used Tailscale to SSH into the car, but some spots in Winston Chung Hall were spotty and caused the car to disconnect. The solution was using our own router to connect to the car. **Make sure the router's subnet and the Lidar's subnet are different, otherwise they will fight for connection!**
 
-## Use the controller 
+### Use the controller 
 The controller is so much more than just the deadman switch! Use ROS services to trigger scripts using buttons. We wired a data collection script to start and stop. 
 
-## Roboracer @ IV 2026
+### Roboracer @ IV 2026
 We didn't qualify because our car was not able to navigate certain section of the track. The track consisted of bumpy orange tubes and smooth black tubes, and our model was only trained on bumpy orange tubes. We believe the failure to navigate black tubes was because of lack of preprocessing and our model had overfit to the bumpy tubes. The track specifications given to us by Roboracer (overall geometry, min and max width) were also very different from the given track. Roboracer also did not let us know about different types of tubes in the same track. We worked in parallel to test heuristic methods and retrain the model on race day, but it did not work. Our TD3 process was very iterative and required multiple rounds of data collection and training, which we did not have time for. However the process of building the car from scratch, wiring up connections, learning RL trial and error was enough of a learning experience in it of itself.
-
-Gif: Car running on Winston Chung Patio
-
 
 I feel like the protagonist of a space movie, writing down all their notes about survival and science and placing them in a file to send back to Earth for future astronauts. Good luck to future teams! ;-)
 Team Plock (Riverside Racers) signing off,
 Amber and Alex
+
+## Bonus media
+
+
+
+https://github.com/user-attachments/assets/9b5fadf0-ad48-43a7-85f5-3a4599ee73b1
+
+
+
+https://github.com/user-attachments/assets/789533e2-8d18-49a4-8d7a-772e97161086
+
+
+https://github.com/user-attachments/assets/57816924-0e37-412d-8010-e502a9bb646d
+
+
 
 
 
