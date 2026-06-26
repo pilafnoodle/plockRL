@@ -4,6 +4,7 @@
 PlockRL is a reinforcement learning pipeline based on the TD3 algorithm for F1Tenth. It tunes an imperfect driving model by training on lidar scan, steering and speed data collected while driving
 
 ## Software file structure
+```
 plockRL/
 
 ├── models/
@@ -11,6 +12,7 @@ plockRL/
 ├── raw_data/
 
 └── transitions/
+```
 
 ## Architecture
 
