@@ -149,18 +149,23 @@ Amber and Alex
 </table>
 <table align="center">
   <tr>
-    <td align="center" width="33%">
-      <video src="https://github.com/user-attachments/assets/9488a808-c09d-4a68-9b96-52cc23e8a26f" controls muted width="100%"></video>
-    </td>
+
     <td align="center" width="33%">
       <video src="https://github.com/user-attachments/assets/9b5fadf0-ad48-43a7-85f5-3a4599ee73b1" controls muted width="100%"></video>
+      <sub>Rviz tests</sub>
+
     </td>
     <td align="center" width="33%">
       <video src="https://github.com/user-attachments/assets/789533e2-8d18-49a4-8d7a-772e97161086" controls muted width="100%"></video>
+      <sub>object avoidance</sub>
+    </td>
+      <td align="center" width="33%">
+      <video src="https://github.com/user-attachments/assets/9488a808-c09d-4a68-9b96-52cc23e8a26f" controls muted width="100%"></video>
+      <sub>Racing Demo</sub>
+
     </td>
   </tr>
 </table>
-Racing, early sim tests, object avoidance testing
 
 
 
