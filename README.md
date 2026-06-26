@@ -94,7 +94,7 @@ plockRL/
 Trained model will be in `models/td3_[name].pth`
 
 9. Move model from PC back to car and run:
-`python3 off_policy_inference.py --model td3_[name].pth
+`python3 off_policy_inference.py --model td3_[name].pth`
 
 **The best models are `td3_ultimate.pth`, `td3_ultimate_interp_set1.pth`,  `td3_ultimate_interp_set2.pth`, `td3_universe.pth`**
 
