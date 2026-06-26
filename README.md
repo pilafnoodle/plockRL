@@ -103,17 +103,25 @@ The provided F1tenth gym in RViz did not translate well at all to the real car. 
 Rewards were very simple, for example adding a penalty when any lidar scan was less than a threshold. More specific rewards such as a heading reward based on the direction of the farthest point were introduced, but there was not enough time to develop it.
 
 ## FUTURE CISL F1TENTH PARTICIPANTS PLEASE READ
-### attempt heuristic method first
+### Attempt heuristic method first
 There are many classical methods for track navigation, such as gap follow, farthest point follower and wall follow. Attempt these first, they are far easier than reinforcement or imitation learning. However these may struggle if competition track intentionally has gaps or holes. 
 
-### streamline pipeline asap
+### Streamline pipeline asap
 It will save alot of time.
 
-### use rosbags
-I forgot these existed, so all data was collected with csvs. Rosbags have synchronization
+### Use rosbags
+I forgot these existed, so all data was collected with csvs. Rosbags have synchronization.
+
+## Isolate network
+Originally we had used Tailscale to SSH into the car, but some spots in Winston Chung Hall were spotty and caused the car to disconnect. The solution was using our own router to connect to the car. **Make sure the router's subnet and the Lidar's subnet are different, otherwise they will fight for connection!**
 
 ## Roboracer @ IV 2026
 We didn't qualify because our car was not able to navigate certain section of the track. The track consisted of bumpy orange tubes and smooth black tubes, and our model was only trained on bumpy orange tubes. We believe the failure to navigate black tubes was because of lack of preprocessing and our model had overfit to the bumpy tubes. The track specifications given to us by Roboracer (overall geometry, min and max width) were also very different from the given track. Roboracer also did not let us know about different types of tubes in the same track. We worked in parallel to test heuristic methods and retrain the model on race day, but it did not work. Our TD3 process was very iterative and required multiple rounds of data collection and training, which we did not have time for. However the process of building the car from scratch, wiring up connections, learning RL trial and error was enough of a learning experience in it of itself.
+
+Gif: Car running on Winston Chung Patio
+
+
+I feel like the protagonist of a space movie writing this down all their notes about survival and science and placing it in a file to send back to Earth for future astronauts. Good luck future teams ;-)
 
 Team Plock (Riverside Racers) signing off,
 Amber and Alex
