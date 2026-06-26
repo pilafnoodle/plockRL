@@ -96,6 +96,9 @@ Inference was optimized to around 2ms per input, which is faster than lidar scan
 ### Add preprocessing
 The type of tubes used for the track can vary. Add 1D gaussian smoothing to eliminate track material specific variation in the lidar scan. In inference, preprocess scan with same smoothing filter. 
 
+### Automate reward tuning
+Our rewards were tuned by hand per iteration which was very time consuming. Test many rewards at once and find a way to evaluate models on **software**.
+
 ### Develop better simulator 
 The provided F1tenth gym in RViz did not translate well at all to the real car. Much time was spent testing on a real car which is time consuming and tiring. 
 
