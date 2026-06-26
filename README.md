@@ -15,7 +15,7 @@ Done: 1 if in crash state
 <p align="center">
   <img src="https://github.com/user-attachments/assets/d62715da-ecab-415a-bbfa-993527dae3f9" width="45%" />
 </p>
-<p align="center"><em>Unofficial Mascot, his name is Birt</em></p>
+<p align="center"><em>Final test day</em></p>
 
 ## Pipeline Architecture
 
