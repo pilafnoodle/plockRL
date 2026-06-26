@@ -93,7 +93,17 @@ plockRL/
 `python3 full_processing.py --name [name]`
 Trained model will be in `models/td3_[name].pth`
 
+9. Move model from PC back to car and run:
+`python3 off_policy_inference.py --model td3_[name].pth
+
+**The best models are `td3_ultimate.pth`, `td3_ultimate_interp_set1.pth`,  `td3_ultimate_interp_set2.pth`, `td3_universe.pth`**
+
+example: `python3 off_policy_inference.py --model td3_ultimate_interp_set1.pth
+
+Some models have specific post processing multipliers, check off_policy_inference.py to uncomment the right ones.
+
 ## Development details
+
 Before data could be collected, we required a driver that could drive the car mostly around a track to fine tune with TD3. For this, we used a farthest point follower on the given f1tenth gym simulator. The first iteration of data collected and trained was simulator only. then, 
 
 The bulk of the work is developing calculate_reward() in recompute_rewards.py. The development process consists of choosing which metrics to penalize and which to optimize and making sure that none conflict or overpower each other. This was tested by writing down possible ranges for every reward and comparing and adding coefficients. This was not efficient and needs to be a better method. 
