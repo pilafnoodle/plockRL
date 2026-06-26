@@ -4,11 +4,13 @@
 PlockRL is a reinforcement learning pipeline based on the TD3 algorithm for F1Tenth. It tunes an imperfect driving model by training on lidar scan, steering and speed data collected while driving. TD3 is an offline algorithm that calculates the reward of the current state by looking at the actions taken and reward of future states. It requires a transition tuple in the state, action, state_prime, reward, done state format
 
 In the context of PlockRL:
+```
 State: the current lidar scan
 Action: speed, steering
 State_prime: the next lidar scan captured
 Reward: value of the current action at the current state
 Done: 1 if in crash state
+```
 
 ## Architecture
 
