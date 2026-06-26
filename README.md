@@ -79,9 +79,14 @@ A model will be output in /models
 ## Development details
 Before data could be collected, we required a driver that could drive the car mostly around a track to fine tune with TD3. For this, we used a farthest point follower on the given f1tenth gym simulator. The first iteration of data collected and trained was simulator only. then, 
 
-The bulk of the work is developing calculate_reward() in recompute_rewards.py. The development process consists of choosing which metrics to penalize and which to optimize and making sure that none conflict or overpower each other. This was tested by writing down possible ranges for every reward and comparing and adding coefficients. This was not efficient and needs to be a better method.
+The bulk of the work is developing calculate_reward() in recompute_rewards.py. The development process consists of choosing which metrics to penalize and which to optimize and making sure that none conflict or overpower each other. This was tested by writing down possible ranges for every reward and comparing and adding coefficients. This was not efficient and needs to be a better method. 
 
-Sometimes the model did not steer enough and external multipliers in the inference script would be used to tune steering and speed with multipliers that scale based on average of forward distance. This worked to some extent, but we were unable to bake the behavior into the model so that it would run without multipliers. However, using multipliers, we were able to collect more perfect data to train on. 
+The previously trained model would be used to jumpstart the TD3 actor in the next training with a different reward function so it could learn quicker. 
+
+We also used a heuristic-based post-processing step. To speed up the car and encourage turning, we added a interpolated multiplier based on the average forward distance. 
+
+` ` 
+However we had trouble tuning the rewards so that the heuristic would be baked into the model
 
 Every reward function is listed in recompute_rewards.py as well as more details in notes.txt
 
@@ -97,7 +102,7 @@ The provided F1tenth gym in RViz did not translate well at all to the real car. 
 ### Create more specific rewards
 Rewards were very simple, for example adding a penalty when any lidar scan was less than a threshold. More specific rewards such as a heading reward based on the direction of the farthest point were introduced, but there was not enough time to develop it.
 
-## FUTURE F1TENTH PARTICIPANTS PLEASE READ
+## FUTURE CISL F1TENTH PARTICIPANTS PLEASE READ
 ### attempt heuristic method first
 There are many classical methods for track navigation, such as gap follow, farthest point follower and wall follow. Attempt these first, they are far easier than reinforcement or imitation learning. However these may struggle if competition track intentionally has gaps or holes. 
 
@@ -107,8 +112,11 @@ It will save alot of time.
 ### use rosbags
 I forgot these existed, so all data was collected with csvs. Rosbags have synchronization
 
+## Roboracer @ IV 2026
+We didn't qualify because our car was not able to navigate certain section of the track. The track consisted of bumpy orange tubes and smooth black tubes, and our model was only trained on bumpy orange tubes. We believe the failure to navigate black tubes was because of lack of preprocessing and our model had overfit to the bumpy tubes. The track specifications given to us by Roboracer (overall geometry, min and max width) were also different from the given track. Roboracer also did not let us know about different types of tubes in the same track. We worked in parallel to test heuristic methods and retrain the model, but it did not work, because our TD3 process was very iterative. 
 
-
+Team Plock (Riverside Racers) signing off,
+Amber and Alex
 
 
 
