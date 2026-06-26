@@ -114,7 +114,7 @@ Sometimes the model did not steer enough and external multipliers in the inferen
 
 Every reward function is listed in recompute_rewards.py as well as more details in notes.txt
 
-Inference was optimized to around 2ms per input
+Inference was optimized to around 2ms per input, which is faster than lidar scan speed, so inference speed is not a bottleneck.
 
 ## Improvements needed
 ### Add preprocessing
