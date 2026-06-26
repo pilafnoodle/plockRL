@@ -92,6 +92,12 @@ Every reward function is listed in recompute_rewards.py as well as more details 
 
 Inference was optimized to around 2ms per input, which is faster than lidar scan speed, so inference speed is not a bottleneck.
 
+ppo_model.py is the outline of a ppo model, but we just use the encoder from it
+
+https://github.com/user-attachments/assets/0c57cc01-f6db-48dc-9371-cc92c9321915
+
+
+
 ## Improvements needed
 ### Add preprocessing
 The type of tubes used for the track can vary. Add 1D gaussian smoothing to eliminate track material specific variation in the lidar scan. In inference, preprocess scan with same smoothing filter. 
@@ -124,8 +130,7 @@ We didn't qualify because our car was not able to navigate certain section of th
 Gif: Car running on Winston Chung Patio
 
 
-I feel like the protagonist of a space movie writing this down all their notes about survival and science and placing it in a file to send back to Earth for future astronauts. Good luck future teams ;-)
-
+I feel like the protagonist of a space movie, writing down all their notes about survival and science and placing them in a file to send back to Earth for future astronauts. Good luck to future teams! ;-)
 Team Plock (Riverside Racers) signing off,
 Amber and Alex
 
