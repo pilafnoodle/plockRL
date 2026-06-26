@@ -87,7 +87,7 @@ plockRL/
 
 6. Move collected data from /data on the car to PC for training.
 
-7. On PC, rename file to raw_states_[name].csv. 
+7. On PC, rename file to `raw_states_[name].csv`. 
 
 8. Run the following:
 `python3 full_processing.py --name [name]`
