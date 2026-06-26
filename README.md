@@ -12,6 +12,9 @@ plockRL/
 
 └── transitions/
 
+## Architecture
+
+
 ## Training pipeline
 Training data is in csv format, where each line is a lidar scan, appended by speed and steering. full_processing.py takes the name of the dataset, calls subprocesses to parse, compute rewards, create transitions for TD3, and outputs a trained model. The TD3 transitions are described below:
 
@@ -60,6 +63,7 @@ Sometimes the model did not steer enough and external multipliers in the inferen
 
 Every reward function is listed in recompute_rewards.py as well as more details in notes.txt
 
+Inference was optimized to around 2ms per input
 
 ## Improvements needed
 ### Add preprocessing
@@ -79,7 +83,7 @@ There are many classical methods for track navigation, such as gap follow, farth
 It will save alot of time.
 
 ### use rosbags
-I forgot these existed, so all data was collected with csvs.
+I forgot these existed, so all data was collected with csvs. Rosbags have synchronization
 
 
 
