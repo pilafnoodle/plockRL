@@ -135,8 +135,10 @@ Team Plock (Riverside Racers) signing off,
 Amber and Alex
 
 ## Bonus media
-<img src="https://github.com/user-attachments/assets/db2cfe1f-52bf-48d3-9c3c-23be15d116dc" width="35%" alt="Unofficial Mascot Birt" />
-His name is Birt
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/db2cfe1f-52bf-48d3-9c3c-23be15d116dc" width="35%" alt="Unofficial Mascot Birt" />
+</p>
+<p align="center"><em>His name is Birt</em></p>
 
 <table align="center">
   <tr>
@@ -151,7 +153,7 @@ His name is Birt
     </td>
   </tr>
 </table>
-
+Racing, early sim tests, object avoidance testing
 
 
 
