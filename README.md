@@ -89,7 +89,7 @@ Trained model will be in `models/td3_[name].pth`
 
 **The best models are `td3_ultimate.pth`, `td3_ultimate_interp_set1.pth`,  `td3_ultimate_interp_set2.pth`, `td3_universe.pth`**
 
-example: `python3 off_policy_inference.py --model td3_ultimate_interp_set1.pth
+example: `python3 off_policy_inference.py --model td3_ultimate_interp_set1.pth`
 
 Some models have specific post processing multipliers, check off_policy_inference.py to uncomment the right ones.
 
