@@ -134,6 +134,8 @@ I feel like the protagonist of a space movie, writing down all their notes about
 Team Plock (Riverside Racers) signing off,
 Amber and Alex
 
+Amber and Alex
+
 ## Bonus media
 <table align="center">
   <tr>
@@ -147,26 +149,22 @@ Amber and Alex
     </td>
   </tr>
 </table>
+
 <table align="center">
   <tr>
-
     <td align="center" width="33%">
-      <video src="https://github.com/user-attachments/assets/9b5fadf0-ad48-43a7-85f5-3a4599ee73b1" controls muted width="100%"></video>
+      <video src="https://github.com/user-attachments/assets/9b5fadf0-ad48-43a7-85f5-3a4599ee73b1" controls muted width="100%"></video><br/>
       <sub>Rviz tests</sub>
-
     </td>
     <td align="center" width="33%">
-      <video src="https://github.com/user-attachments/assets/789533e2-8d18-49a4-8d7a-772e97161086" controls muted width="100%"></video>
+      <video src="https://github.com/user-attachments/assets/789533e2-8d18-49a4-8d7a-772e97161086" controls muted width="100%"></video><br/>
       <sub>object avoidance</sub>
     </td>
-      <td align="center" width="33%">
-      <video src="https://github.com/user-attachments/assets/9488a808-c09d-4a68-9b96-52cc23e8a26f" controls muted width="100%"></video>
+    <td align="center" width="33%">
+      <video src="https://github.com/user-attachments/assets/9488a808-c09d-4a68-9b96-52cc23e8a26f" controls muted width="100%"></video><br/>
       <sub>Racing Demo</sub>
-
     </td>
-  </tr>
-</table>
-
+  </tr> </table>
 
 
 
