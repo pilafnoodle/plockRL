@@ -1,7 +1,7 @@
 # PlockRL: Successes, Failures and Thoughts
 
 ## Overview
-PlockRL is a reinforcement learning pipeline based on the offline TD3 algorithm for F1Tenth. It tunes an imperfect driving model by training on lidar scan, steering and speed data collected while driving. It requires a transition tuple in the state, action, state_prime, reward, done state format.
+PlockRL is a reinforcement learning pipeline for F1Tenth based on the TD3 algorithm. It tunes an imperfect driving model offline by training on lidar scan, steering and speed data collected while driving. It requires a transition tuple in the state, action, state_prime, reward, done state format.
 
 In the context of PlockRL:
 ```
