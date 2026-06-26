@@ -6,11 +6,8 @@ PlockRL is a reinforcement learning pipeline based on the TD3 algorithm for F1Te
 ## Software file structure
 ```
 plockRL/
-
 ├── models/
-
 ├── raw_data/
-
 └── transitions/
 ```
 
