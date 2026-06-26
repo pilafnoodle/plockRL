@@ -12,10 +12,11 @@ Reward: value of the current action at the current state
 Done: 1 if in crash state
 ```
 
-<img width="2597" height="1797" alt="image" src="https://github.com/user-attachments/assets/d62715da-ecab-415a-bbfa-993527dae3f9" />
-<img width="1500" height="2000" alt="20260614_152620" src="https://github.com/user-attachments/assets/db2cfe1f-52bf-48d3-9c3c-23be15d116dc" />
-Unofficial Mascot, his name is Birt
-
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/d62715da-ecab-415a-bbfa-993527dae3f9" width="45%" alt="Pipeline Layout" />
+  <img src="https://github.com/user-attachments/assets/db2cfe1f-52bf-48d3-9c3c-23be15d116dc" width="35%" alt="Unofficial Mascot Birt" />
+</p>
+<p align="center"><em>Unofficial Mascot, his name is Birt</em></p>
 
 ## Pipeline Architecture
 
