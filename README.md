@@ -1,15 +1,14 @@
 # plockRL: Successes, Failures and Thoughts
 
 ## Overview
-PlockRL is a reinforcement learning pipeline based on the TD3 algorithm for F1Tenth. It tunes an imperfect driving model by training on lidar scan, steering and speed data collected while driving
+PlockRL is a reinforcement learning pipeline based on the TD3 algorithm for F1Tenth. It tunes an imperfect driving model by training on lidar scan, steering and speed data collected while driving. TD3 is an offline algorithm that calculates the reward of the current state by looking at the actions taken and reward of future states. It requires a transition tuple in the state, action, state_prime, reward, done state format
 
-## Software file structure
-```
-plockRL/
-├── models/
-├── raw_data/
-└── transitions/
-```
+In the context of PlockRL:
+State: the current lidar scan
+Action: speed, steering
+State_prime: the next lidar scan captured
+Reward: value of the current action at the current state
+Done: 1 if in crash state
 
 ## Architecture
 
@@ -57,7 +56,13 @@ plockRL/
          │ • Actor updates delayed by 2 epochs      │
          └──────────────────────────────────────────┘
 ```
-
+## File structure
+```
+plockRL/
+├── models/
+├── raw_data/
+└── transitions/
+```
 
 ## Training pipeline
 Training data is in csv format, where each line is a lidar scan, appended by speed and steering. full_processing.py takes the name of the dataset, calls subprocesses to parse, compute rewards, create transitions for TD3, and outputs a trained model. The TD3 transitions are described below:
