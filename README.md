@@ -159,7 +159,7 @@ Amber and Alex
       <sub>His name is birt</sub>
     </td>
     <td align="center" valign="top" width="40%">
-      <img src="https://github.com/user-attachments/assets/d07d52d0-5fe1-40eb-8efd-4f48ada4afa6" width="100%" /><br/>
+      <img src="https://github.com/user-attachments/assets/d07d52d0-5fe1-40eb-8efd-4f48ada4afa6" height ="80%"/><br/>
       <sub>Avoidance testing</sub>
     </td>
   </tr>
