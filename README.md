@@ -1,7 +1,7 @@
-# PlockRL: Process and Thoughts
+# BirtRL: Process and Thoughts
 
 ## Overview
-PlockRL is a reinforcement learning pipeline for F1Tenth based on the TD3 algorithm. It tunes an imperfect driving model offline by training on lidar scan, steering and speed data collected while driving. 
+BirtRL is a reinforcement learning pipeline for F1Tenth based on the TD3 algorithm. It tunes an imperfect driving model offline by training on lidar scan, steering and speed data collected while driving. 
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/d62715da-ecab-415a-bbfa-993527dae3f9" width="45%" />
